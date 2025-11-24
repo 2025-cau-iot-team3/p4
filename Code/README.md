@@ -1,4 +1,4 @@
-#  Korean Speech-to-Text (STT)
+#  Korean Speech-to-Text (STT) + Voice Assistant (Clover)
 
 마이크로 말한 음성을 OpenAI Whisper로 실시간 변환하고,
 웨이크워드(“모모야”) 감지 후 날씨 / 시간 / 타이머 기능을 수행하는 음성비서입니다.
