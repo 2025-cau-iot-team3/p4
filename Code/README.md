@@ -1,13 +1,16 @@
 #  Korean Speech-to-Text (STT)
 
-마이크로 말한 음성을 **OpenAI Whisper 모델**을 통해 실시간으로 텍스트로 변환하는 Python 프로그램입니다.  
-스페이스바로 녹음을 종료하고 텍스트를 확인할 수 있으며, 엔터로 프로그램을 종료합니다.
+마이크로 말한 음성을 OpenAI Whisper로 실시간 변환하고,
+웨이크워드(“모모야”) 감지 후 날씨 / 시간 / 타이머 기능을 수행하는 음성비서입니다.
+
+스페이스바로 녹음을 종료하고 텍스트로 확인할 수 있으며,
+라즈베리파이에서는 상시 음성 스트리밍 모드로 작동합니다.
 
 ---
 
 ## 설치 방법
 
-### 필수 명령어
+### 필수 라이브러리 설치
 아래 명령어를 **터미널(VSCode, PowerShell 등)** 에 한 줄씩 입력
 
 ```bash
@@ -16,3 +19,7 @@ py -m pip install torch
 py -m pip install sounddevice
 py -m pip install scipy
 py -m pip install keyboard
+py -m pip install numpy
+py -m pip install requests
+py -m pip install gTTS
+py -m pip install playsound
