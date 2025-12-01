@@ -13,4 +13,4 @@ CITY_KO = "서울"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 # 명령 인식용 Whisper 모델
-CMD_MODEL_NAME = "small"   # 느리면 "base"나 "tiny"로 바꿔도 됨
+CMD_MODEL_NAME = "tiny"   # 느리면 "base"나 "tiny"로 바꿔도 됨
