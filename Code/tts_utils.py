@@ -4,6 +4,9 @@ import os
 import sys
 import threading
 import tempfile
+import numpy as np
+import sounddevice as sd
+import time
 from gtts import gTTS
 
 # 로봇이 말하는 중인지 표시 (말하는 동안에는 마이크 입력 무시)
@@ -66,3 +69,16 @@ def play_ding():
         winsound.PlaySound(ding_path, winsound.SND_FILENAME | winsound.SND_ASYNC)
     else:
         os.system(f"aplay '{ding_path}' >/dev/null 2>&1 &")
+
+def play_beep(times=3, frequency=1000, duration=0.15):
+    """
+    타이머 종료 시 삐 소리를 여러 번 재생
+    """
+    fs = 44100
+    t = np.linspace(0, duration, int(fs*duration), False)
+    tone = 0.5 * np.sin(frequency * 2 * np.pi * t)
+
+    for _ in range(times):
+        sd.play(tone, fs)
+        sd.wait()
+        time.sleep(0.1)
