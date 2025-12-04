@@ -14,12 +14,12 @@
 아래 명령어를 **터미널(VSCode, PowerShell 등)** 에 한 줄씩 입력
 
 ```bash
-py -m pip install git+https://github.com/openai/whisper.git
-py -m pip install torch
-py -m pip install sounddevice
-py -m pip install scipy
-py -m pip install keyboard
-py -m pip install numpy
-py -m pip install requests
-py -m pip install gTTS
-py -m pip install playsound
+pip install git+https://github.com/openai/whisper.git
+pip install torch
+pip install sounddevice
+pip install scipy
+pip install keyboard
+pip install numpy
+pip install requests
+pip install gTTS
+pip install playsound
