@@ -9,7 +9,6 @@ from config import SAMPLE_RATE
 from tts_utils import is_speaking
 
 # 블록 / VAD 설정
-INPUT_DEVICE_INDEX = 2
 BLOCK_SIZE = 1024           # 약 64ms
 SILENCE_THRESHOLD = 0.003   # 이 이하 RMS는 무음으로 간주
 SILENCE_DURATION = 0.6      # 이 시간(초) 이상 무음이면 '말 끝남'
