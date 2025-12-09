@@ -2,7 +2,7 @@
 import torch
 
 # 오디오 설정
-SAMPLE_RATE = 16000
+SAMPLE_RATE = 48000
 
 # OpenWeather API
 OPENWEATHER_API_KEY = "YOUR_TOKEN_HERE"
