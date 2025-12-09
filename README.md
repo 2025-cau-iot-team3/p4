@@ -1,25 +1,44 @@
-#  Korean Speech-to-Text (STT) + Voice Assistant (Clover)
+# 모모 음성 비서 (Vosk + gTTS, Raspberry Pi)
 
-마이크로 말한 음성을 OpenAI Whisper로 실시간 변환하고,
-웨이크워드(“모모야”) 감지 후 날씨 / 시간 / 타이머 기능을 수행하는 음성비서입니다.
+라즈베리파이에서 동작하는 초간단 음성 비서입니다.
 
-스페이스바로 녹음을 종료하고 텍스트로 확인할 수 있으며,
-라즈베리파이에서는 상시 음성 스트리밍 모드로 작동합니다.
+- 사용자가 말한 문장에서 **`날씨` / `시간(시각)` / `타이머`** 라는 단어가 포함되면  
+  → 해당 기능을 실행하고, 결과를 **TTS(음성)** 로 읽어줍니다.
+- 그 외 안내/에러 메시지는 **터미널 텍스트 출력만** 합니다.  
+- 웨이크워드(“모모야”)는 **필수 아님** – 그냥  
+  - “오늘 날씨 알려줘”  
+  - “지금 시간 알려줘”  
+  - “3분 타이머 맞춰줘”  
+  처럼 말하면 됩니다.
 
 ---
 
-## 설치 방법
+## 기능 요약
 
-### 필수 라이브러리 설치
-아래 명령어를 **터미널(VSCode, PowerShell 등)** 에 한 줄씩 입력
+- 🎤 **음성 인식(STT)**:  
+  - [Vosk](https://alphacephei.com/vosk/) 한국어 모델(`vosk-model-small-ko-0.22`) 사용  
+  - 완전 로컬, 인터넷 불필요
 
-```bash
-pip install git+https://github.com/openai/whisper.git
-pip install torch
-pip install sounddevice
-pip install scipy
-pip install keyboard
-pip install numpy
-pip install requests
-pip install gTTS
-pip install playsound
+- 🔊 **음성 출력(TTS)**:  
+  - `gTTS`로 TTS → `ffmpeg`로 WAV 변환 → `aplay`로 재생  
+  - **날씨/시간/타이머 응답에만 TTS 사용**
+
+- 🌤 **날씨 조회**:  
+  - OpenWeatherMap API 사용  
+  - `현재 서울 날씨는 맑음이며, 온도는 3.2도, 체감 온도는 0.5도입니다.` 형태로 응답
+
+- ⏰ **현재 시각 안내**:  
+  - `현재 시간은 15시 23분입니다.`
+
+- ⏱ **타이머**:  
+  - “3분 타이머”, “5분만 타이머 맞춰줘” → N분 뒤에 TTS로 종료 안내
+
+---
+
+## 파일 구조 예시
+
+```text
+pi4/Code/
+├── simple_assistant_whisper.py   # 메인 실행 파일 (Vosk + gTTS)
+├── config.py                     # API 키, 도시 설정 등
+└── (기타 파일들…)
