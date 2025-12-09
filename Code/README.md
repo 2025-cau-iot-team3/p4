@@ -77,12 +77,12 @@ vosk-model-small-ko-0.22
 
 모델 위치:
 ```text
-/home/soargrape/models/vosk-model-small-ko-0.22/
+/home/사용자/models/vosk-model-small-ko-0.22/
 ```
 
 simple_assistant_whisper.py 내부 모델 경로:
 ```python
-VOSK_MODEL_PATH = "/home/soargrape/models/vosk-model-small-ko-0.22"
+VOSK_MODEL_PATH = "/home/사용자/models/vosk-model-small-ko-0.22"
 ```
 
 ---
@@ -126,7 +126,7 @@ https://openweathermap.org/api
 ## 8. 실행 방법
 
 ```bash
-ssh soargrape@raspberrypi.local
+ssh 사용자@raspberrypi.local
 source ~/venv/bin/activate
 cd ~/pi4/Code
 python3 simple_assistant_whisper.py
@@ -174,7 +174,7 @@ pi4/Code/
 which ffmpeg
 which aplay
 speaker-test -t wav
-ls /home/soargrape/models/vosk-model-small-ko-0.22
+ls /home/s사용자/models/vosk-model-small-ko-0.22
 ```
 
 ---
