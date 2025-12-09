@@ -1,5 +1,3 @@
-#수정본
-
 import os
 import re
 import time
@@ -34,14 +32,13 @@ print("[시스템] Vosk 한국어 모델 로딩 완료.")
 
 # ==============================
 # 2. TTS (gTTS → ffmpeg → aplay)
-#    👉 날씨 / 시간 / 타이머에서만 사용
+#    👉 날씨 / 시간 / 타이머 / 인사에서만 사용
 # ==============================
 
 def speak_korean(text: str):
     """
     gTTS로 한국어 음성을 생성하고,
     ffmpeg으로 WAV로 변환 후 aplay로 재생.
-    (날씨 / 시간 / 타이머 응답에서만 호출)
     """
     if not text:
         return
@@ -196,20 +193,55 @@ def get_time_message() -> str:
     return f"현재 시간은 {h}시 {m}분입니다."
 
 
-def parse_timer_minutes(text: str) -> int:
+# ★★★ 타이머: '분' + '초' 모두 지원하는 파서 ★★★
+def parse_timer_duration_seconds(text: str) -> int:
     """
-    '3분', '5분 타이머', '10분만' 같은 문장에서 분 단위 숫자를 추출
-    없으면 기본 3분.
+    '3분', '10초', '1분 30초', '5분 타이머' 등에서
+    총 타이머 시간을 '초 단위'로 변환해서 반환.
+    숫자가 전혀 없으면 기본 3분(180초).
     """
-    m = re.search(r"(\d+)\s*분", text)
-    if m:
-        return int(m.group(1))
-    return 3
+    no_space = text.replace(" ", "")
+
+    # 분 / 초 각각 찾기
+    m_min = re.search(r"(\d+)\s*분", no_space)
+    m_sec = re.search(r"(\d+)\s*초", no_space)
+
+    total_seconds = 0
+
+    if m_min:
+        total_seconds += int(m_min.group(1)) * 60
+    if m_sec:
+        total_seconds += int(m_sec.group(1))
+
+    # 숫자가 하나도 없으면 기본 3분
+    if total_seconds <= 0:
+        total_seconds = 3 * 60
+
+    return total_seconds
+
+
+# ★★★ 한국어로 예쁘게 시간 표현 ★★★
+def format_duration_korean(seconds: int) -> str:
+    """
+    90 → '1분 30초'
+    60 → '1분'
+    10 → '10초'
+    """
+    minutes = seconds // 60
+    sec = seconds % 60
+
+    if minutes and sec:
+        return f"{minutes}분 {sec}초"
+    elif minutes:
+        return f"{minutes}분"
+    else:
+        return f"{sec}초"
 
 
 def handle_command(text: str):
     """
     전체 문장을 받아서
+    - (0) 인사
     - '날씨' / '기온' / '온도'  포함 → 날씨 TTS + 출력
     - '시간' / '시각' / '몇 시' 포함 → 현재 시간 TTS + 출력
     - '타이머' / '알람' 포함 → 타이머 TTS + 출력
@@ -220,6 +252,13 @@ def handle_command(text: str):
         return
 
     no_space = text.replace(" ", "")
+
+    # 0) 인사말
+    if ("안녕" in no_space) or ("안녕하세요" in no_space):
+        msg = "안녕하세요, 저는 인공지능 반려로봇 모모에요."
+        print("[인사 응답]", msg)
+        speak_korean(msg)
+        return
 
     # 1) 날씨 관련
     if ("날씨" in no_space) or ("기온" in no_space) or ("온도" in no_space):
@@ -237,22 +276,24 @@ def handle_command(text: str):
 
     # 3) 타이머 / 알람 관련
     if ("타이머" in no_space) or ("알람" in no_space):
-        minutes = parse_timer_minutes(no_space)
-        start_msg = f"{minutes}분 뒤에 알려드릴게요."
+        total_seconds = parse_timer_duration_seconds(text)
+        duration_text = format_duration_korean(total_seconds)
+
+        start_msg = f"{duration_text} 뒤에 알려드릴게요."
         print("[타이머 설정]", start_msg)
         speak_korean(start_msg)   # ✅ 시작 안내도 TTS
 
         # 매우 단순한 블로킹 타이머
-        time.sleep(minutes * 60)
+        time.sleep(total_seconds)
 
-        end_msg = f"{minutes}분 타이머가 종료되었습니다."
+        end_msg = f"{duration_text} 타이머가 종료되었습니다."
         print("[타이머 종료]", end_msg)
         speak_korean(end_msg)     # ✅ 종료 안내도 TTS
         return
 
     # 4) 해당 키워드가 하나도 없을 때 → 글만 출력
     print("[안내] 인식된 문장:", text)
-    print("[안내] 아직은 날씨, 시간, 타이머와 관련된 말만 이해할 수 있어요.")
+    print("[안내] 아직은 인사, 날씨, 시간, 타이머와 관련된 말만 이해할 수 있어요.")
     # ❌ TTS 호출하지 않음
 
 
@@ -264,20 +305,18 @@ def handle_command(text: str):
 # ==============================
 
 def main():
-    print("=== 모모 비서 (단일 명령 모드: 음성으로 '날씨/시간/타이머' 요청) ===\n")
+    print("=== 모모 비서 (단일 명령 모드: 음성으로 '인사/날씨/시간/타이머' 요청) ===\n")
 
     first = True
 
     while True:
         if first:
-            # 처음 한 번은 바로 시작
             first = False
         else:
-            # 이후에는 엔터로 다시 시작
             input("\n>>> 다시 명령을 시작하시려면 엔터를 눌러 주세요 : ")
 
         print("\n원하시는 기능을 말해주세요.")
-        print("예: 오늘 날씨 알려줘 / 지금 시간 알려줘 / 3분 타이머 맞춰줘")
+        print("예: 안녕 / 오늘 날씨 알려줘 / 지금 시간 알려줘 / 10초 타이머 맞춰줘 / 1분 30초 타이머")
         print("5초 안에 말씀하지 않으면 준비를 종료합니다.\n")
 
         # 5초 동안 녹음
@@ -289,7 +328,6 @@ def main():
         # 아무 말도 없거나, STT가 완전 날려먹었을 때
         if not text:
             print("[안내] 5초 안에 말씀이 없어 준비를 종료합니다. 엔터로 다시 시작할 수 있습니다.")
-            # ❌ 여기서는 TTS 없음
             continue  # while 처음으로 → 엔터 대기
 
         # 인식된 문장에 따라 명령 처리
